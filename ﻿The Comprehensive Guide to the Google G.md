@@ -1,5 +1,3 @@
-Okay, I will reformat the provided comprehensive guide on the Google Gen AI JavaScript SDK. This will involve removing all citation marks (like [span_XXX](start_span)[span_XXX](end_span) and their variations) and structuring the document with clear Markdown headings and formatting, while ensuring no informational content from the report is omitted or altered.
-Here is the formatted report:
 The Comprehensive Guide to the Google Gen AI JavaScript SDK (@google/genai)
 I. Introduction to the Google Gen AI SDK (@google/genai)
 A. Purpose, Goals, and Key Features
