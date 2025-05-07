@@ -1,4 +1,6 @@
-﻿The Comprehensive Guide to the Google Gen AI JavaScript SDK (@google/genai)
+Okay, I will reformat the provided comprehensive guide on the Google Gen AI JavaScript SDK. This will involve removing all citation marks (like [span_XXX](start_span)[span_XXX](end_span) and their variations) and structuring the document with clear Markdown headings and formatting, while ensuring no informational content from the report is omitted or altered.
+Here is the formatted report:
+The Comprehensive Guide to the Google Gen AI JavaScript SDK (@google/genai)
 I. Introduction to the Google Gen AI SDK (@google/genai)
 A. Purpose, Goals, and Key Features
 The @google/genai package represents the primary, modern Software Development Kit (SDK) designed for JavaScript and TypeScript developers seeking to leverage the capabilities of Google's Gemini family of large language models (LLMs). Its fundamental purpose is to provide a streamlined and robust interface for building AI-powered applications.
@@ -34,140 +36,113 @@ The "Preview" designation, coupled with the simultaneous deprecation of the olde
 II. Getting Started
 This section guides developers through the initial steps required to install the SDK, obtain necessary credentials, and run a basic example.
 A. Installation
-Installing the @google/genai SDK is straightforward using the Node Package Manager (npm). Execute the following command in your project terminal:bash
+Installing the @google/genai SDK is straightforward using the Node Package Manager (npm). Execute the following command in your project terminal:
 npm install @google/genai
 
-This command downloads and installs the package and its dependencies into your project's `node_modules` directory and adds it to your `package.json` file.[span_106](start_span)[span_106](end_span)[span_107](start_span)[span_107](end_span)[span_108](start_span)[span_108](end_span)[span_109](start_span)[span_109](end_span)[span_110](start_span)[span_110](end_span)
-
-### B. Obtaining Credentials
-
+This command downloads and installs the package and its dependencies into your project's node_modules directory and adds it to your package.json file.
+B. Obtaining Credentials
 The SDK requires appropriate credentials to authenticate requests to Google's AI services. The method depends on whether you intend to use the Gemini Developer API or the Vertex AI platform.
+ * Gemini Developer API (API Key):
+   * This method uses an API key generated via Google AI Studio. Navigate to https://aistudio.google.com/apikey, log in with your Google account, and create an API key.
+   * Important Note on Regional Availability: The free tier associated with API keys generated in AI Studio might have geographic restrictions. For instance, users in certain European countries may need to set up a billing account to use the API, even if the region itself is supported. Refer to the official list of available regions for details.
+   * API keys should be treated as sensitive credentials. For security best practices, see Section III.D.
+ * Vertex AI (Google Cloud Authentication):
+   * Interacting with the Vertex AI backend does not use API keys. Instead, it relies on Google Cloud's standard Identity and Access Management (IAM) mechanisms.
+   * Prerequisites: You need a Google Cloud project with billing enabled, and the Vertex AI API must be activated for that project.
+   * Authentication: The recommended way for local development is to use Application Default Credentials (ADC). Install the Google Cloud CLI (gcloud) and run the following command to authenticate:
+     gcloud auth application-default login
 
-*   **Gemini Developer API (API Key):**
-    *   This method uses an API key generated via Google AI Studio.[span_111](start_span)[span_111](end_span)[span_112](start_span)[span_112](end_span)[span_113](start_span)[span_113](end_span)[span_114](start_span)[span_114](end_span) Navigate to [https://aistudio.google.com/apikey](https://aistudio.google.com/apikey), log in with your Google account, and create an API key.
-    *   **Important Note on Regional Availability:** The *free tier* associated with API keys generated in AI Studio might have geographic restrictions. For instance, users in certain European countries may need to set up a billing account to use the API, even if the region itself is supported.[span_115](start_span)[span_115](end_span)[span_116](start_span)[span_116](end_span)[span_117](start_span)[span_117](end_span) Refer to the official list of [available regions](https://ai.google.dev/gemini-api/docs/available-regions) for details.[span_118](start_span)[span_118](end_span)
-    *   API keys should be treated as sensitive credentials. For security best practices, see Section III.D.
-
-*   **Vertex AI (Google Cloud Authentication):**
-    *   Interacting with the Vertex AI backend does *not* use API keys. Instead, it relies on Google Cloud's standard Identity and Access Management (IAM) mechanisms.[span_119](start_span)[span_119](end_span)[span_120](start_span)[span_120](end_span)[span_121](start_span)[span_121](end_span)[span_122](start_span)[span_122](end_span)
-    *   **Prerequisites:** You need a Google Cloud project with billing enabled, and the Vertex AI API must be activated for that project.[span_123](start_span)[span_123](end_span)[span_126](start_span)[span_126](end_span)
-    *   **Authentication:** The recommended way for local development is to use Application Default Credentials (ADC). Install the Google Cloud CLI (`gcloud`) and run the following command to authenticate:
-        ```bash
-        gcloud auth application-default login
-        ```
-        This command initiates a browser-based flow to authenticate your user account and stores the credentials locally, where the SDK can automatically detect and use them.[span_124](start_span)[span_124](end_span)[span_127](start_span)[span_127](end_span) For applications running on Google Cloud infrastructure (like Cloud Functions, App Engine, GKE), the SDK typically uses the attached service account credentials automatically.
-
-### C. Quickstart Example
-
+     This command initiates a browser-based flow to authenticate your user account and stores the credentials locally, where the SDK can automatically detect and use them. For applications running on Google Cloud infrastructure (like Cloud Functions, App Engine, GKE), the SDK typically uses the attached service account credentials automatically.
+C. Quickstart Example
 The following examples demonstrate the minimal code needed to send a simple text prompt and receive a response, illustrating both API key and Vertex AI initialization.
-
-*   **Using API Key (Gemini Developer API):**
-
-    ```javascript
-    // Import the main class from the SDK
-    import { GoogleGenAI } from '@google/genai';
-
-    // Access your API key securely (e.g., from environment variables)
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    if (!GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY environment variable not set.");
-    }
-
-    // Initialize the GoogleGenAI instance with the API key
-    const genAI = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-
-    async function run() {
-      try {
-        // Get a reference to the desired Gemini model
-        // Using a 'flash' model is common for quickstarts due to speed/cost
-        const model = genAI.models.getGenerativeModel({ model: 'gemini-1.5-flash' }); // Or 'gemini-2.0-flash' etc.
-
-        // Define the prompt
-        const prompt = "Explain how AI works in a few words";
-
-        // Send the prompt to the model and wait for the response
-        const result = await model.generateContent(prompt);
-
-        // Access the response object
-        const response = result.response;
-
-        // Extract and print the generated text
-        const text = response.text();
-        console.log(text);
-
-      } catch (error) {
-        console.error("Error generating content:", error);
-      }
-    }
-
-    run();
-    ```
-    *[span_129](start_span)[span_129](end_span)[span_130](start_span)[span_130](end_span)[span_131](start_span)[span_131](end_span)[span_132](start_span)[span_132](end_span)[span_133](start_span)[span_133](end_span)*
-
-*   **Using Vertex AI:**
-
-    ```javascript
-    // Import the main class
-    import { GoogleGenAI } from '@google/genai';
-
-    // Your Google Cloud project ID and location
-    const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT;
-    const LOCATION = process.env.GOOGLE_CLOUD_LOCATION; // e.g., 'us-central1'
-
-    if (!PROJECT_ID ||!LOCATION) {
-      throw new Error("GOOGLE_CLOUD_PROJECT or GOOGLE_CLOUD_LOCATION environment variables not set.");
-    }
-
-    // Initialize the GoogleGenAI instance for Vertex AI
-    // Assumes ADC or service account credentials are set up in the environment
-    const genAI = new GoogleGenAI({
-      vertexai: true,
-      project: PROJECT_ID,
-      location: LOCATION,
-    });
-
-    async function runVertex() {
-      try {
-        // Get a reference to the model (ensure it's available in your Vertex AI region)
-        const model = genAI.models.getGenerativeModel({ model: 'gemini-1.5-flash' }); // Or 'gemini-2.0-flash' etc.
-
-        const prompt = "Explain how AI works in a few words";
-
-        const result = await model.generateContent(prompt);
-        const response = result.response;
-        const text = response.text();
-        console.log(text);
-
-      } catch (error) {
-        console.error("Error generating content via Vertex AI:", error);
-      }
-    }
-
-    runVertex();
-    ```
-    *[span_134](start_span)[span_134](end_span)[span_135](start_span)[span_135](end_span)[span_136](start_span)[span_136](end_span)*
-
-The consistent use of "flash" model variants (like `gemini-1.5-flash` or `gemini-2.0-flash`) in these quickstart examples across different languages and platforms is noteworthy.[span_137](start_span)[span_137](end_span)[span_138](start_span)[span_138](end_span)[span_139](start_span)[span_139](end_span)[span_140](start_span)[span_140](end_span)[span_141](start_span)[span_141](end_span)[span_142](start_span)[span_142](end_span)[span_143](start_span)[span_143](end_span)[span_144](start_span)[span_144](end_span) This pattern suggests that Google strategically positions these models as the ideal entry point for developers. Flash models typically offer a compelling balance of performance (speed), cost-efficiency, and capability, making them well-suited for initial experimentation, prototyping, and many common generative tasks. Developers can quickly get started and achieve results before potentially needing to explore the more powerful, and often more resource-intensive, "Pro" versions for highly complex reasoning or generation requirements.[span_145](start_span)[span_145](end_span)[span_146](start_span)[span_146](end_span)
-
----
-
-## III. Core Concepts: Initialization and Configuration
-
-Understanding how to initialize and configure the `@google/genai` SDK is fundamental to using it effectively and securely.
-
-### A. The `GoogleGenAI` Class
-
-As established, the `GoogleGenAI` class, imported from the `@google/genai` package, serves as the central entry point for all SDK functionalities.[span_4](start_span)[span_4](end_span)[span_18](start_span)[span_18](end_span) An instance of this class must be created before accessing models or other features.
-
-### B. Initialization: Gemini Developer API (API Key)
-
-To connect to the Gemini Developer API backend (typically associated with Google AI Studio), instantiate the `GoogleGenAI` class by providing your API key within the configuration object:
-
-```javascript
+ * Using API Key (Gemini Developer API):
+   // Import the main class from the SDK
 import { GoogleGenAI } from '@google/genai';
 
-const apiKey = process.env.GEMINI_API_KEY |
-| 'YOUR_API_KEY'; // Best practice: Use environment variables
+// Access your API key securely (e.g., from environment variables)
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+if (!GEMINI_API_KEY) {
+  throw new Error("GEMINI_API_KEY environment variable not set.");
+}
+
+// Initialize the GoogleGenAI instance with the API key
+const genAI = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+
+async function run() {
+  try {
+    // Get a reference to the desired Gemini model
+    // Using a 'flash' model is common for quickstarts due to speed/cost
+    const model = genAI.models.getGenerativeModel({ model: 'gemini-1.5-flash' }); // Or 'gemini-2.0-flash' etc.
+
+    // Define the prompt
+    const prompt = "Explain how AI works in a few words";
+
+    // Send the prompt to the model and wait for the response
+    const result = await model.generateContent(prompt);
+
+    // Access the response object
+    const response = result.response;
+
+    // Extract and print the generated text
+    const text = response.text();
+    console.log(text);
+
+  } catch (error) {
+    console.error("Error generating content:", error);
+  }
+}
+
+run();
+
+ * Using Vertex AI:
+   // Import the main class
+import { GoogleGenAI } from '@google/genai';
+
+// Your Google Cloud project ID and location
+const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT;
+const LOCATION = process.env.GOOGLE_CLOUD_LOCATION; // e.g., 'us-central1'
+
+if (!PROJECT_ID ||!LOCATION) {
+  throw new Error("GOOGLE_CLOUD_PROJECT or GOOGLE_CLOUD_LOCATION environment variables not set.");
+}
+
+// Initialize the GoogleGenAI instance for Vertex AI
+// Assumes ADC or service account credentials are set up in the environment
+const genAI = new GoogleGenAI({
+  vertexai: true,
+  project: PROJECT_ID,
+  location: LOCATION,
+});
+
+async function runVertex() {
+  try {
+    // Get a reference to the model (ensure it's available in your Vertex AI region)
+    const model = genAI.models.getGenerativeModel({ model: 'gemini-1.5-flash' }); // Or 'gemini-2.0-flash' etc.
+
+    const prompt = "Explain how AI works in a few words";
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
+    console.log(text);
+
+  } catch (error) {
+    console.error("Error generating content via Vertex AI:", error);
+  }
+}
+
+runVertex();
+
+The consistent use of "flash" model variants (like gemini-1.5-flash or gemini-2.0-flash) in these quickstart examples across different languages and platforms is noteworthy. This pattern suggests that Google strategically positions these models as the ideal entry point for developers. Flash models typically offer a compelling balance of performance (speed), cost-efficiency, and capability, making them well-suited for initial experimentation, prototyping, and many common generative tasks. Developers can quickly get started and achieve results before potentially needing to explore the more powerful, and often more resource-intensive, "Pro" versions for highly complex reasoning or generation requirements.
+III. Core Concepts: Initialization and Configuration
+Understanding how to initialize and configure the @google/genai SDK is fundamental to using it effectively and securely.
+A. The GoogleGenAI Class
+As established, the GoogleGenAI class, imported from the @google/genai package, serves as the central entry point for all SDK functionalities. An instance of this class must be created before accessing models or other features.
+B. Initialization: Gemini Developer API (API Key)
+To connect to the Gemini Developer API backend (typically associated with Google AI Studio), instantiate the GoogleGenAI class by providing your API key within the configuration object:
+import { GoogleGenAI } from '@google/genai';
+
+const apiKey = process.env.GEMINI_API_KEY || 'YOUR_API_KEY'; // Best practice: Use environment variables
 
 const genAI = new GoogleGenAI({ apiKey: apiKey });
 
@@ -176,10 +151,8 @@ C. Initialization: Vertex AI
 To utilize the Vertex AI backend, instantiate GoogleGenAI with specific parameters indicating the target Google Cloud project and location:
 import { GoogleGenAI } from '@google/genai';
 
-const projectId = process.env.GOOGLE_CLOUD_PROJECT |
-| 'your_project_id';
-const location = process.env.GOOGLE_CLOUD_LOCATION |
-| 'your_location'; // e.g., 'us-central1'
+const projectId = process.env.GOOGLE_CLOUD_PROJECT || 'your_project_id';
+const location = process.env.GOOGLE_CLOUD_LOCATION || 'your_location'; // e.g., 'us-central1'
 
 const genAI = new GoogleGenAI({
   vertexai: true,      // Explicitly enable Vertex AI mode
@@ -195,7 +168,7 @@ Strong Warning: Never embed your GEMINI_API_KEY directly into client-side code (
 Recommendations:
  * Server-Side Implementation: Use the @google/genai SDK with API keys primarily in secure server-side environments (e.g., Node.js backend, Cloud Functions). Store the API key securely using environment variables or dedicated secret management services (like Google Secret Manager or HashiCorp Vault). Your server acts as a proxy, receiving requests from the client, securely adding the API key, calling the Gemini API, and relaying the response back to the client.
  * Vertex AI for Client-Side: For applications requiring direct calls to the Gemini API from the client-side (especially production or enterprise applications), the recommended approach is to use the Vertex AI backend. Vertex AI relies on robust Google Cloud IAM authentication, eliminating the need for exposeable API keys. For web applications, integrating Vertex AI via the Firebase SDK for Web is often suggested, as it provides additional security features like Firebase App Check to protect against unauthorized client access.
-The SDK technically allows initialization with an API key in a browser environment , likely facilitating quick experimentation and learning. However, this capability creates a potential pitfall if developers are unaware of the severe security risks involved in deploying such code to production. The SDK itself does not prevent this insecure pattern; it relies on developer diligence and adherence to best practices, as emphasized in the documentation. Robust developer education, like this guide, is essential to prevent accidental API key exposure in client-side applications.
+The SDK technically allows initialization with an API key in a browser environment, likely facilitating quick experimentation and learning. However, this capability creates a potential pitfall if developers are unaware of the severe security risks involved in deploying such code to production. The SDK itself does not prevent this insecure pattern; it relies on developer diligence and adherence to best practices, as emphasized in the documentation. Robust developer education, like this guide, is essential to prevent accidental API key exposure in client-side applications.
 IV. Interacting with Models (ai.models)
 The ai.models submodule provides the core functionality for interacting with the Gemini models, including generating content, managing configurations, and retrieving model information.
 A. Obtaining a GenerativeModel Instance
@@ -203,12 +176,12 @@ Before generating content, you need an instance of the GenerativeModel class. Th
 const model = genAI.models.getGenerativeModel({
   model: 'gemini-1.5-pro-latest', // Specify the desired model ID
   // Optional: Set default configurations for this model instance
-  safetySettings:...*/],
+  safetySettings: [/*...*/],
   generationConfig: { /*... GenerationConfig object... */ },
   systemInstruction: { /*... SystemInstruction object... */ }
 });
 
-While some early examples might show direct calls like genAI.models.generateContent , using getGenerativeModel first is the standard and more flexible approach. It allows you to associate specific default configurations (like safety settings or generation parameters) directly with the model instance you intend to use. The model ID should be one of the available identifiers (e.g., gemini-1.5-flash, gemini-1.5-pro-001). Using aliases like -latest is convenient but may change underlying versions over time.
+While some early examples might show direct calls like genAI.models.generateContent, using getGenerativeModel first is the standard and more flexible approach. It allows you to associate specific default configurations (like safety settings or generation parameters) directly with the model instance you intend to use. The model ID should be one of the available identifiers (e.g., gemini-1.5-flash, gemini-1.5-pro-001). Using aliases like -latest is convenient but may change underlying versions over time.
 B. Generating Content: generateContent
 The primary method for making a single, non-streaming request to the model is generateContent.
 async function generate(prompt) {
@@ -284,14 +257,22 @@ The structure of data sent to and received from the model revolves around two ke
    * functionResponse: Represents the result returned after executing a function (see Section IX.A).
 Example Multimodal Content Structure:
 const request = {
-  contents:
+  contents: [
+    {
+      role: 'user',
+      parts: [
+        { text: "Describe this image:" },
+        { inlineData: { mimeType: 'image/jpeg', data: 'base64_encoded_image_data' } }
+        // Or using fileData for uploaded files:
+        // { fileData: { mimeType: 'video/mp4', fileUri: 'uploaded_file_uri_or_gs_uri' } }
+      ]
     }
   ]
 };
 
 E. Configuring Generation (GenerationConfig)
 The GenerationConfig object allows fine-grained control over how the model generates responses. It can be passed during getGenerativeModel initialization (setting defaults) or within the request object for individual generateContent or generateContentStream calls.
-Key GenerationConfig parameters include :
+Key GenerationConfig parameters include:
  * temperature: (Number, 0.0 to 1.0) Controls the randomness of the output. Lower values (e.g., 0.2) make the output more deterministic and focused, while higher values (e.g., 0.8) increase creativity and diversity. Default often varies by model.
  * maxOutputTokens: (Integer) Sets the maximum number of tokens the model can generate in the response. This helps control response length and cost. Token limits vary significantly between models.
  * topP: (Number, 0.0 to 1.0) Nucleus sampling. Considers only the most probable tokens whose cumulative probability mass exceeds topP.
@@ -314,7 +295,7 @@ const result = await model.generateContent({
 
 F. Providing System Instructions (systemInstruction)
 System instructions provide high-level guidance, context, or persona constraints to the model, influencing its behavior across subsequent user prompts within a session or for a single request. They act like a preamble before the main prompt.
-The systemInstruction is typically structured as a Content object with the role 'system':
+The systemInstruction is typically structured as a Content object with the role: 'system':
 const systemInstruction = {
   role: 'system',
   parts: [{ text: "You are a helpful assistant that speaks like a pirate." }]
@@ -370,7 +351,7 @@ async function countMyTokens(promptContent) {
 
 // Example usage:
 const promptText = "This is a sample text to count tokens for.";
-countMyTokens({ contents: }] });
+countMyTokens({ contents: [{ role: 'user', parts: [{ text: promptText }] }] });
 
 The method takes a request object similar in structure to generateContent (requiring the contents field) and returns a Promise resolving to an object containing the totalTokens count. Refer to model documentation or the table below for specific input/output token limits, as exceeding them will result in errors.
 Table: Key Gemini Model Capabilities and Limits (via @google/genai)
@@ -381,7 +362,6 @@ Table: Key Gemini Model Capabilities and Limits (via @google/genai)
 | gemini-1.5-flash / -001 | 1,048,576 | 8,192 | Yes | Yes | Yes | Yes | No | September 2024 |
 | gemini-1.5-flash-8b | 1,048,576 | 8,192 | Yes | Yes | Yes | Yes | No | October 2024 |
 | gemini-1.5-pro / -001 | 2,097,152 | 8,192 | Yes | Yes | Yes | No | Yes | Varies by version |
-
 Note: Capabilities and limits are subject to change. Always consult the latest official Google documentation for the specific model version you are using.
 This table provides a quick reference for comparing common Gemini models accessible via the SDK. Understanding these differences is crucial for selecting the right model based on input size requirements, desired features (like tuning or real-time interaction), and the need for the most up-to-date information (knowledge cutoff).
 V. Building Conversational Applications (ai.chats)
@@ -396,7 +376,7 @@ const chat = model.startChat({
     { role: "user", parts: [{ text: "Hello!" }] },
     { role: "model", parts: [{ text: "Hi there! How can I help you today?" }] }
   ],
-  safetySettings:...*/],
+  safetySettings: [/*...*/],
   generationConfig: { /*... GenerationConfig...*/ },
   tools: [/*... FunctionDeclarations for function calling... */]
 });
@@ -472,7 +452,7 @@ async function runChat() {
 runChat();
 
 Function calling (Section IX.A) integrates seamlessly with ChatSession, making it easier to handle the multi-step function execution flow within a conversation.
-While the ChatSession abstraction greatly simplifies chatbot development by handling history automatically, this convenience might involve a trade-off. The automatic management means developers have less direct control over precisely which parts of the history are included in each request. For very long conversations where token limits become a concern , advanced strategies like summarizing past turns or selectively pruning the history might be necessary. If ChatSession doesn't offer explicit configuration for such advanced context management (which is not detailed in the available information), developers might need to revert to using the generateContent method and managing the history array manually to implement these optimizations.
+While the ChatSession abstraction greatly simplifies chatbot development by handling history automatically, this convenience might involve a trade-off. The automatic management means developers have less direct control over precisely which parts of the history are included in each request. For very long conversations where token limits become a concern, advanced strategies like summarizing past turns or selectively pruning the history might be necessary. If ChatSession doesn't offer explicit configuration for such advanced context management (which is not detailed in the available information), developers might need to revert to using the generateContent method and managing the history array manually to implement these optimizations.
 VI. Managing Media with the Files API (ai.files)
 The @google/genai SDK includes a dedicated Files API, accessible via the ai.files submodule, designed for managing media files (images, audio, video, documents) used in conjunction with the Gemini Developer API (API Key) backend.
 A. Overview and Use Cases
@@ -531,7 +511,13 @@ async function generateWithFile(uploadedFile, promptText) {
     // const filePart = createPartFromFile(uploadedFile);
 
     const request = {
-      contents:
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            filePart,
+            { text: promptText }
+          ]
         }
       ]
     };
@@ -550,7 +536,7 @@ async function generateWithFile(uploadedFile, promptText) {
 // Example usage (assuming 'imageFile' was returned from uploadFile):
 // await generateWithFile(imageFile, "Describe the main subject in this image.");
 
-The SDK might provide helper functions (like createPartFromUri mentioned in  or potentially createPartFromFile) to simplify creating the fileData part.
+The SDK might provide helper functions (like createPartFromUri mentioned in some contexts or potentially createPartFromFile) to simplify creating the fileData part.
 D. File Management (get, list, delete)
 The Files API provides methods to manage your uploaded files:
  * Get Metadata: Retrieve details about a specific uploaded file using its name.
@@ -598,7 +584,7 @@ E. File API Limits, Lifecycle, and Supported Types
  * Supported Types: While not exhaustively listed in all snippets, examples demonstrate support for common image formats (JPEG, PNG), audio (MP3, MPEG), video, and PDF documents. Consult the official REST API documentation for a complete list of supported MIME types.
  * Cost: The Files API itself (uploading, managing files) is available at no cost in regions where the Gemini API is available. Costs are incurred when the file is processed by the model during a generateContent call.
 F. Best Practices for File Prompting
-When incorporating files into your prompts, consider these strategies for better results :
+When incorporating files into your prompts, consider these strategies for better results:
  * Be Specific: Clearly instruct the model on what to do with the file (e.g., "Summarize this audio," "Extract tables from this PDF," "Describe the mood of this image").
  * Provide Examples (Few-Shot): If asking for a specific output format based on file content, include examples in your prompt to guide the model.
  * Break Down Complex Tasks: For multi-step analysis of a file, structure your prompt accordingly.
@@ -632,7 +618,7 @@ async function createMyCache(contentToCache, systemInstructionText, toolsArray) 
     const cacheConfig = {
       model: modelName,
       displayName: 'My Document Cache', // Optional user-friendly name
-      systemInstruction: systemInstructionText? { role: 'system', parts: } : undefined,
+      systemInstruction: systemInstructionText ? { role: 'system', parts: [{ text: systemInstructionText }] } : undefined,
       contents: contentToCache, // Array of Content objects (can include file references)
       tools: toolsArray, // Optional array of Tool objects (e.g., function declarations)
       ttl: '7200s' // Optional: Time-to-live (e.g., 2 hours). Default is 1 hour.
@@ -656,7 +642,7 @@ async function createMyCache(contentToCache, systemInstructionText, toolsArray) 
 
 // Example Usage:
 // Assuming 'bookFile' is an uploaded file object from ai.files.upload
-// const contentForCache = }];
+// const contentForCache = [{ role: 'user', parts: [{ fileData: { mimeType: bookFile.mimeType, fileUri: bookFile.uri } }] }];
 // const systemInstruction = "You are an expert literary analyst.";
 // const myCache = await createMyCache(contentForCache, systemInstruction, undefined);
 
@@ -708,7 +694,7 @@ async function queryCachedContentDirect(modelInstance, cacheName, newPromptText)
        // Reference the cache by its full resource name
        cachedContent: cacheName,
        // Provide ONLY the new content/prompt
-       contents: }]
+       contents: [{ role: 'user', parts: [{ text: newPromptText }] }],
        // DO NOT include systemInstruction or tools if they were part of the cache
      };
 
@@ -765,14 +751,14 @@ F. Limitations
 VIII. Enabling Real-Time Interactions (ai.live)
 The ai.live submodule introduces the Live API, a powerful capability for building applications that require low-latency, bidirectional, and stateful communication with Gemini models, primarily using WebSockets.
 A. Introduction to the Live API
-The Live API enables real-time, streaming interactions, moving beyond the traditional request-response paradigm. Key features include :
+The Live API enables real-time, streaming interactions, moving beyond the traditional request-response paradigm. Key features include:
  * Low Latency: Designed for responsive, near real-time communication.
  * Bidirectional Streaming: Allows simultaneous sending of input (text, audio, video) and receiving of output (text, audio).
  * Stateful Sessions: Maintains context throughout a persistent WebSocket connection.
  * Interruption Handling: Users can interrupt the model's spoken output with their own voice or input.
  * Natural Conversation: Facilitates more human-like voice interactions.
 Common use cases include voice assistants, real-time translation, interactive agents, and AI copilots that can react to streaming media input.
-Status: The Live API is often marked as Preview or Experimental, particularly for certain features or when accessed via specific model versions (like gemini-2.0-flash-exp on Vertex AI). Developers should be prepared for potential API changes and consult documentation for the latest status.
+Status: The Live API is often marked as "Preview" or "Experimental," particularly for certain features or when accessed via specific model versions (like gemini-2.0-flash-exp on Vertex AI). Developers should be prepared for potential API changes and consult documentation for the latest status.
 B. Connecting a Live Session (ai.live.connect)
 A Live API interaction begins by establishing a WebSocket session using the connect method (likely asynchronous):
 // Assuming 'genAI' is initialized GoogleGenAI instance
@@ -782,7 +768,7 @@ A Live API interaction begins by establishing a WebSocket session using the conn
 async function startLiveSession(modelName) {
   try {
     const config = {
-      responseModalities:, // Request both text and audio output
+      responseModalities: ['TEXT', 'AUDIO'], // Request both text and audio output
       systemInstruction: { parts: [{ text: "You are a helpful voice assistant." }] },
       // Add other configurations like tools, speech_config, etc.
       // speechConfig: { languageCode: 'en-US' } // Example
@@ -801,7 +787,7 @@ async function startLiveSession(modelName) {
 
 The connect method typically requires:
  * model: The model ID supporting the Live API (often an experimental version).
- * config: A configuration object (LiveConnectConfig or similar) specifying session parameters :
+ * config: A configuration object (LiveConnectConfig or similar) specifying session parameters:
    * responseModalities: An array indicating desired output types ('TEXT', 'AUDIO').
    * systemInstruction: Initial guidance for the model.
    * tools: Function declarations, code execution, or search tools.
@@ -848,7 +834,7 @@ async function receiveFromLiveSession(session) {
       if (message.audio) {
         console.log("Received Audio Chunk:", message.audio.length, "bytes");
         // Play audio chunk (requires audio playback library)
-        // Ensure playback uses correct format (e.g., Raw 16-bit PCM @ 24kHz [span_419](start_span)[span_419](end_span))
+        // Ensure playback uses correct format (e.g., Raw 16-bit PCM @ 24kHz)
       }
       if (message.toolCalls) {
         console.log("Received Tool Call:", message.toolCalls);
@@ -862,7 +848,7 @@ async function receiveFromLiveSession(session) {
          console.log("Received Transcription:", message.transcription.text);
          // Display real-time transcription of user speech
       }
-      // Handle other message types like ActivityStart/End, SetupComplete, GoAway etc. [span_449](start_span)[span_449](end_span)
+      // Handle other message types like ActivityStart/End, SetupComplete, GoAway etc.
     }
     console.log("Session receive loop ended.");
   } catch (error) {
@@ -874,9 +860,9 @@ async function receiveFromLiveSession(session) {
 // Start listening after connecting
 // receiveFromLiveSession(mySession);
 
-The session.receive() method likely returns an asynchronous iterator. Each message received (BidiGenerateContentServerMessage ) needs to be inspected to determine its type and content. Common fields include:
+The session.receive() method likely returns an asynchronous iterator. Each message received (BidiGenerateContentServerMessage) needs to be inspected to determine its type and content. Common fields include:
  * text: Contains generated text chunks.
- * audio: Contains binary audio chunks. Requires appropriate decoding and playback (e.g., at 24kHz PCM ).
+ * audio: Contains binary audio chunks. Requires appropriate decoding and playback (e.g., at 24kHz PCM).
  * toolCalls: Indicates a function call request from the model.
  * usageMetadata: Provides token usage information.
  * transcription: Contains real-time transcription of the user's input audio.
@@ -905,17 +891,17 @@ Beyond basic text and multimodal generation, the @google/genai SDK provides acce
 A. Function Calling
 Function calling empowers the Gemini models to go beyond generating text by allowing them to interact with external tools, APIs, or databases defined by the developer. This enables applications where the AI can fetch real-time data (weather, stock quotes), perform actions (book appointments, send emails), or query private data sources.
 Workflow:
-The function calling process involves a structured interaction between the application and the model :
- * Declare Functions: The developer defines the available functions the model can potentially call. Each function is described using a FunctionDeclaration object, which includes :
+The function calling process involves a structured interaction between the application and the model:
+ * Declare Functions: The developer defines the available functions the model can potentially call. Each function is described using a FunctionDeclaration object, which includes:
    * name: A unique identifier for the function (e.g., get_weather_forecast).
    * description: A clear, natural language explanation of what the function does and when it should be used. This is crucial for the model's decision-making.
    * parameters: An object defining the expected input arguments for the function, using a schema (often JSON Schema-like) specifying parameter names, types (STRING, NUMBER, BOOLEAN, OBJECT, ARRAY), descriptions, and whether they are required.
      These declarations are passed to the model within the tools array in the generateContent request or startChat configuration.
- * Model Generates FunctionCall: The model analyzes the user's prompt in the context of the available function declarations. If it determines that calling one or more functions is necessary to fulfill the request, its response will include a Part of type functionCall. This FunctionCall object contains :
+ * Model Generates FunctionCall: The model analyzes the user's prompt in the context of the available function declarations. If it determines that calling one or more functions is necessary to fulfill the request, its response will include a Part of type functionCall. This FunctionCall object contains:
    * name: The name of the function the model wants to execute.
    * args: An object containing the arguments (key-value pairs) the model has determined should be passed to the function, based on the user's prompt and the function's parameter schema.
  * Execute Function (Application Code): The application receives the model's response, checks for the presence of a functionCall part, extracts the name and args, and then executes the corresponding actual function (which could be a local function, an external API call, a database query, etc.) using the provided arguments. The model itself does not execute the function code.
- * Return FunctionResponse: The application takes the result (output) from its function execution and sends it back to the model in the next turn of the conversation. This is done by including a Part of type functionResponse in the contents array. This part contains :
+ * Return FunctionResponse: The application takes the result (output) from its function execution and sends it back to the model in the next turn of the conversation. This is done by including a Part of type functionResponse in the contents array. This part contains:
    * name: The name of the function that was executed.
    * response: An object containing the actual data returned by the function execution (often structured as { content:... }).
      This process is often simpler when using ai.chats, as the SDK helps manage sending the response back in the context of the ongoing conversation. The model then uses this function result to generate its final, user-facing response.
@@ -938,7 +924,7 @@ const getWeatherDeclaration = {
 
 // Your actual function implementation
 function getCurrentWeather(location, unit = "celsius") {
-  console.log(`Fetching weather for ${location} in ${unit}...`);
+  console.log(`Workspaceing weather for ${location} in ${unit}...`);
   // --- Make actual API call to weather service here ---
   // Dummy response:
   const weatherData = { temperature: 22, condition: "Sunny" };
@@ -963,7 +949,7 @@ async function runFunctionCallChat() {
 
   if (functionCalls && functionCalls.length > 0) {
     console.log("Model requested function call:", functionCalls);
-    const call = functionCalls; // Assuming one call for simplicity
+    const call = functionCalls[0]; // Assuming one call for simplicity
 
     if (call.name === "get_current_weather") {
       // 3. Execute the function
@@ -974,7 +960,14 @@ async function runFunctionCallChat() {
       // For chat, sending the function response might be part of the next sendMessage call's history,
       // or a specific method. The SDK usually handles formatting this.
       // The example below sends an array of Parts, one of which is the functionResponse.
-      result = await chat.sendMessage();
+      // Constructing the Part for function response:
+      const functionResponsePart = {
+        functionResponse: {
+          name: "get_current_weather",
+          response: apiResponse
+        }
+      };
+      result = await chat.sendMessage([functionResponsePart]); // Send Part array
       response = result.response;
     }
   }
@@ -986,7 +979,7 @@ async function runFunctionCallChat() {
 runFunctionCallChat();
 
 Execution Modes:
-You can influence how the model uses functions via the functionCallingConfig within toolConfig :
+You can influence how the model uses functions via the functionCallingConfig within toolConfig:
  * AUTO (Default): The model decides whether to call a function or respond directly with text.
  * ANY: Forces the model to call a function. You can optionally provide allowed_function_names to restrict which functions it can choose from.
  * NONE: Prevents the model from calling any functions.
@@ -998,5 +991,10 @@ Grounding with Google Search:
  * Purpose: Connects the model to the public web via Google Search, providing access to up-to-date information on a vast range of topics.
  * Implementation: Enabled by adding a GoogleSearchRetrieval tool object to the tools array in the generateContent request.
    const request = {
-  contents: [{ role: 'user', parts: [{
+  contents: [{ role: 'user', parts: [{ text: "What are the latest advancements in quantum computing?" }] }],
+  tools: [{ googleSearchRetrieval: {} }] // Enable grounding with Google Search
+};
+
+// const result = await model.generateContent(request);
+// Access grounding metadata from result.response.groundingMetadata
 
